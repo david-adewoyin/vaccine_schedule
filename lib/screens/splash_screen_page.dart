@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vaccine_scheduler/screens/home.dart';
 import 'package:vaccine_scheduler/screens/onboarding_page.dart';
+import 'package:vaccine_scheduler/styles.dart';
 
 class SplashScreenPage extends StatelessWidget {
   const SplashScreenPage({Key? key}) : super(key: key);
@@ -8,7 +9,7 @@ class SplashScreenPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //TODO change to future
-    final Future<bool> _isFreshInstall = Future.value(false);
+    final Future<bool> _isFreshInstall = Future.value(true);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -22,8 +23,8 @@ class SplashScreenPage extends StatelessWidget {
             return const OnboardingPage();
           }
 
-          return const Center(
-            child: Text("Vaccination Scheduler"),
+          return Center(
+            child: Text("Vaccination Scheduler", style: TextStyles.h4),
           );
         },
       ),
