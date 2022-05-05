@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:vaccine_scheduler/styles.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({Key? key}) : super(key: key);
@@ -16,11 +19,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
     if (index > 2) return;
 
     var carouselImages = [
-      'assets/images/page_1.png',
+      'assets/images/mother.png',
+      'assets/images/mother.png',
+      'assets/images/mother.png',
     ];
-    var carouselHeadings = ["desc"];
+    var carouselHeadings = [
+      "Add Child Details",
+      "Notification & Reminders",
+      "Monitor Vaccine History",
+    ];
 
-    var carouselBody = ["body"];
+    var carouselBody = [
+      "Add child details and autogenerate recommended vaccine schedule",
+      "Get notified when it's due to get your child vaccinated. Never miss a vaccine deadline again",
+      "Monitor and see the vaccine history of your child"
+    ];
 
     return BuildCarouselItem(
       key: UniqueKey(),
@@ -37,37 +50,58 @@ class _OnboardingPageState extends State<OnboardingPage> {
         alignment: Alignment.center,
         children: [
           PageView.builder(
-              controller: _controller,
-              itemCount: 3,
-              onPageChanged: (value) {
-                setState(() {
-                  _currentPageNotifier.value = value;
-                });
-              },
-              itemBuilder: (context, value) => builder(value)),
-          Positioned(
-            bottom: 80,
-            child: Row(
-              children: [
-                PageIndicator(
-                  notifier: _currentPageNotifier,
-                  index: 0,
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                PageIndicator(
-                  notifier: _currentPageNotifier,
-                  index: 1,
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                PageIndicator(
-                  notifier: _currentPageNotifier,
-                  index: 2,
-                ),
-              ],
+            controller: _controller,
+            itemCount: 3,
+            onPageChanged: (value) {
+              setState(() {
+                _currentPageNotifier.value = value;
+              });
+            },
+            itemBuilder: (context, value) => builder(value),
+          ),
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+
+              padding: EdgeInsets.only(bottom: 80,left: 50,right: 40),
+              width: double.maxFinite,
+
+      //      bottom: 80,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PageIndicator(
+                          notifier: _currentPageNotifier,
+                          index: 0,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        PageIndicator(
+                          notifier: _currentPageNotifier,
+                          index: 1,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        PageIndicator(
+                          notifier: _currentPageNotifier,
+                          index: 2,
+                        ),
+                      ],
+                    ),
+
+                  ],),
+                  Spacer(),
+                  Column(mainAxisSize:MainAxisSize.min,children: [Row(children: [Text("Next",style: TextStyles.h6,),Icon(Icons.navigate_next_rounded)],)],)
+                ],
+              ),
             ),
           )
         ],
@@ -89,18 +123,38 @@ class BuildCarouselItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
         height: 500,
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Column(
           children: [
             SizedBox(
-              height: 500,
+              height: 100,
+            ),
+            Text(
+              "Vaccine Scheduler",
+              style: GoogleFonts.oleoScript(textStyle: TextStyles.h5),
+            ),
+            SizedBox(
+              height: 300,
               child: Padding(
-                  padding: const EdgeInsets.only(top: 120, bottom: 30),
+                  padding: const EdgeInsets.only(top: 50, bottom: 0),
                   child: Image.asset(image)),
             ),
-            Text(heading),
             const SizedBox(height: 50),
+            Text(
+              heading,
+              style: GoogleFonts.oleoScript(textStyle: TextStyles.h5),
+            ),
+            const SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Text(
+                body,
+                style: GoogleFonts.redHatDisplay(textStyle: TextStyles.h6),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ],
         ));
   }
