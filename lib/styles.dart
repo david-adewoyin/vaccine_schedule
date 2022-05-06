@@ -6,8 +6,8 @@ class FontSizes {
 
   static double get h3 => 48 * scale;
   static double get h4 => 38 * scale;
-  static double get h5 => 27 * scale;
-  static double get h6 => 20 * scale;
+  static double get h5 => 26 * scale;
+  static double get h6 => 22 * scale;
   static double get body => 16 * scale;
   static double get bodySm => 14 * scale;
   static double get button => 14 * scale;
@@ -33,7 +33,7 @@ class TextStyles {
         letterSpacing: 0,
       );
 
-  static TextStyle get body => TextStyle(
+  static TextStyle get body => GoogleFonts.poppins(
         fontSize: FontSizes.body,
         fontWeight: FontWeight.w500,
         letterSpacing: 0,

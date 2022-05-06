@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vaccine_scheduler/screens/register_child_page.dart';
 import 'package:vaccine_scheduler/styles.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -19,9 +20,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
     if (index > 2) return;
 
     var carouselImages = [
-      'assets/images/mother.png',
-      'assets/images/mother.png',
-      'assets/images/mother.png',
+      'assets/images/grandma.png',
+      'assets/images/calender.png',
+      'assets/images/nurse_2.png',
     ];
     var carouselHeadings = [
       "Add Child Details",
@@ -62,44 +63,90 @@ class _OnboardingPageState extends State<OnboardingPage> {
           Container(
             alignment: Alignment.bottomCenter,
             child: Container(
-
-              padding: EdgeInsets.only(bottom: 80,left: 50,right: 40),
+              padding: EdgeInsets.only(bottom: 80, left: 40, right: 30),
               width: double.maxFinite,
 
-      //      bottom: 80,
+              //      bottom: 80,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        PageIndicator(
-                          notifier: _currentPageNotifier,
-                          index: 0,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        PageIndicator(
-                          notifier: _currentPageNotifier,
-                          index: 1,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        PageIndicator(
-                          notifier: _currentPageNotifier,
-                          index: 2,
-                        ),
-                      ],
-                    ),
-
-                  ],),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PageIndicator(
+                            notifier: _currentPageNotifier,
+                            index: 0,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          PageIndicator(
+                            notifier: _currentPageNotifier,
+                            index: 1,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          PageIndicator(
+                            notifier: _currentPageNotifier,
+                            index: 2,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   Spacer(),
-                  Column(mainAxisSize:MainAxisSize.min,children: [Row(children: [Text("Next",style: TextStyles.h6,),Icon(Icons.navigate_next_rounded)],)],)
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.black,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          elevation: 0,
+                        ),
+                        onPressed: () {
+                          if (_currentPageNotifier.value == 2) {
+                            Navigator.push<void>(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) =>
+                                    RegisterChildPage(),
+                              ),
+                            );
+                          } else {
+                            setState(() {
+                              _controller.animateToPage(
+                                  _currentPageNotifier.value + 1,
+                                  duration: Duration(milliseconds: 600),
+                                  curve: Curves.easeIn);
+                              /*      _controller.nextPage(
+                                  duration: Duration(milliseconds: 600),
+                                  curve: Curves.decelerate); */
+                              _currentPageNotifier.value =
+                                  _currentPageNotifier.value + 1;
+                            });
+                          }
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              (_currentPageNotifier.value == 2)
+                                  ? "Get Started"
+                                  : "Next",
+                              style: TextStyles.h6,
+                            ),
+                            Icon(Icons.navigate_next_rounded)
+                          ],
+                        ),
+                      )
+                    ],
+                  )
                 ],
               ),
             ),
@@ -129,29 +176,42 @@ class BuildCarouselItem extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(
-              height: 100,
+              height: 120,
             ),
-            Text(
+            /*  Text(
               "Vaccine Scheduler",
-              style: GoogleFonts.oleoScript(textStyle: TextStyles.h5),
-            ),
+              style: GoogleFonts.poppins(textStyle: TextStyles.h5),
+            ), */
             SizedBox(
               height: 300,
               child: Padding(
-                  padding: const EdgeInsets.only(top: 50, bottom: 0),
-                  child: Image.asset(image)),
+                  padding: const EdgeInsets.only(
+                      top: 50, bottom: 0, left: 20, right: 20),
+                  child: Image.asset(
+                    image,
+                    height: 250,
+                    width: 300,
+                  )),
             ),
             const SizedBox(height: 50),
             Text(
               heading,
-              style: GoogleFonts.oleoScript(textStyle: TextStyles.h5),
+              style: GoogleFonts.poppins(
+                textStyle: TextStyles.h5,
+                wordSpacing: 2,
+                /*  color: Color(0xFF2A94F4), */
+              ),
             ),
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Text(
                 body,
-                style: GoogleFonts.redHatDisplay(textStyle: TextStyles.h6),
+                style: GoogleFonts.redHatDisplay(
+                    color: Colors.blueGrey,
+                    textStyle: TextStyles.h6,
+                    wordSpacing: 2,
+                    height: 1.55),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -176,13 +236,25 @@ class PageIndicatorState extends State<PageIndicator> {
     if (widget.index == widget.notifier.value) {
       isActive = true;
     }
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isActive ? Colors.pink : Colors.green[300],
-      ),
-    );
+    if (widget.index == widget.notifier.value) {
+      return Container(
+        width: 20,
+        height: 12,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(100)),
+          shape: BoxShape.rectangle,
+          color: Color(0xFF2A94F4),
+        ),
+      );
+    } else {
+      return Container(
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.blueGrey,
+        ),
+      );
+    }
   }
 }
