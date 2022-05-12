@@ -71,6 +71,8 @@ extension TextStyleHelpers on TextStyle {
   TextStyle get regular => copyWith(fontWeight: FontWeight.w400);
   TextStyle get medium => copyWith(fontWeight: FontWeight.w500);
   TextStyle get sizePlus => copyWith(fontSize: fontSize! + 1);
+  TextStyle get sizeMinus => copyWith(fontSize: fontSize! - 1);
+
   TextStyle withSize(double fontsize) => copyWith(fontSize: fontsize);
   TextStyle withColor(Color color) => copyWith(color: color);
   TextStyle letterSpacing(double value) => copyWith(letterSpacing: value);

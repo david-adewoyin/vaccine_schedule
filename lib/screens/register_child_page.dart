@@ -161,7 +161,7 @@ class RegisterChildPage extends StatelessWidget {
               ),
             ),
         */
-            SizedBox(height: 50),
+            SizedBox(height: 20),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
