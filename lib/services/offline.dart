@@ -129,7 +129,7 @@ class DbProvider {
   late Database db;
 
   Future<void> initDb() async {
-    String path = join(await getDatabasesPath(), "vaccine_scheduler_1.db");
+    String path = join(await getDatabasesPath(), "vaccine_scheduler_000.db");
     try {
       await open(path);
     } catch (e) {
@@ -226,15 +226,16 @@ create table $_tableVaccine (
     return null;
   }
 
-  Future<ChildModel?> getChildren() async {
-    List<VaccineModel> vacs = [];
+  Future<List<ChildModel>> getChildren() async {
+    List<ChildModel> children = [];
     List<Map> maps = await db.query(
       _tableChildren,
       columns: [_columnChildId, _columnName, _columnDob, _columnGender],
     );
-    if (maps.isNotEmpty) {
-      var first = maps.first as Map<String, Object?>;
-      var child = Child.fromMap(first);
+    for (var map in maps) {
+      List<VaccineModel> vacs = [];
+      var m = map as Map<String, Object?>;
+      var child = Child.fromMap(m);
       var vs = await getVaccines(child.id!);
       for (var v in vs) {
         vacs.add(VaccineModel(
@@ -245,15 +246,16 @@ create table $_tableVaccine (
             vaccineName: v.vaccineName));
       }
       var date = DateTime.tryParse(child.dob!);
-      return ChildModel(
+      var ch = ChildModel(
         id: child.id!,
         dob: date!,
         name: child.name!,
         gender: child.gender!,
         vaccines: vacs,
       );
+      children.add(ch);
     }
-    return null;
+    return children;
   }
 
   Future<int> delete(int id) async {

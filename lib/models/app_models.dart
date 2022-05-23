@@ -16,12 +16,12 @@ class AppModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  removeChild(String id) {
+  removeChild(int id) {
     _children.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 
-  ChildModel? getChild(String id) {
+  ChildModel? getChild(int id) {
     return _children.where((element) => element.id == id).first;
   }
 
@@ -34,7 +34,6 @@ class AppModel extends ChangeNotifier {
   }
 
   setIsFreshInstall(bool fresh) {
-    print(" i am here");
     _isFreshInstall = fresh;
     notifyListeners();
   }

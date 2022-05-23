@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       builder: (context, _) {
         BootstrapCommand().run(context);
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Vaccine Scheduler',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             primarySwatch: Colors.blue,

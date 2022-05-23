@@ -193,11 +193,11 @@ class _RegisterChildPageState extends State<RegisterChildPage> {
                         ),
                         items: const [
                           DropdownMenuItem(
-                            value: "boy",
+                            value: "male",
                             child: Text("boy"),
                           ),
                           DropdownMenuItem(
-                            value: "girl",
+                            value: "female",
                             child: Text("girl"),
                           )
                         ],

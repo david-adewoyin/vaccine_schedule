@@ -8,6 +8,7 @@ import 'package:vaccine_scheduler/services/app_service.dart';
 BuildContext? _mainContext;
 BuildContext get mainContext => _mainContext!;
 bool get hasContext => _mainContext != null;
+// ignore: non_constant_identifier_names
 bool _app_is_bootstrapped = false;
 void setContext(BuildContext context) {
   _mainContext = context;
@@ -41,8 +42,8 @@ class BootstrapCommand extends BaseAppCommand {
     if (!appModel.isFreshInstall()) {
       print("here ......");
 
-      var firstChild = await appService.getInitialChild();
-      appModel.addChild(firstChild);
+      var children = await appService.getInitialChildren();
+      appModel.setChildren(children);
     }
     _app_is_bootstrapped = true;
   }
@@ -56,6 +57,17 @@ class RegisterChildCommand extends BaseAppCommand {
     var child = await appService.registerChild(name, dob, gender);
     appModel.addChild(child);
     appService.setUserOnboarded();
+  }
+}
+
+class RegisterNewChildCommand extends BaseAppCommand {
+  Future<ChildModel> run(
+      {required String name,
+      required DateTime dob,
+      required String gender}) async {
+    var child = await appService.registerChild(name, dob, gender);
+    appModel.addChild(child);
+    return child;
   }
 }
 

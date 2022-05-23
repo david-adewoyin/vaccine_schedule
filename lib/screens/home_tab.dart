@@ -4,14 +4,161 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:vaccine_scheduler/commands/bootstrap_command.dart';
+import 'package:intl/intl.dart';
 import 'package:vaccine_scheduler/models/app_models.dart';
+import 'package:vaccine_scheduler/models/child_model.dart';
 import 'package:vaccine_scheduler/models/vaccine_model.dart';
+import 'package:vaccine_scheduler/screens/add_new_child.dart';
+import 'package:vaccine_scheduler/screens/register_child_page.dart';
+import 'package:vaccine_scheduler/services/offline.dart';
 import 'package:vaccine_scheduler/styles.dart';
 
 class HomeTabWidget extends StatelessWidget {
-  HomeTabWidget({
+  const HomeTabWidget({
     Key? key,
   }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var c = context.watch<AppModel>();
+    var children = c.getChildren();
+    return SafeArea(
+      child: Container(
+        color: const Color(0x00fafafa),
+        margin: const EdgeInsets.only(bottom: 20),
+        child: BuildWidget(
+          childrenModels: children,
+        ),
+      ),
+    );
+  }
+}
+
+class BuildWidget extends StatefulWidget {
+  final List<ChildModel> childrenModels;
+  const BuildWidget({Key? key, required this.childrenModels}) : super(key: key);
+
+  @override
+  State<BuildWidget> createState() => _BuildWidgetState();
+}
+
+class _BuildWidgetState extends State<BuildWidget> {
+  List<DropdownMenuItem<ChildModel>> buildChildModelWidget(
+      List<ChildModel> children) {
+    List<DropdownMenuItem<ChildModel>> dropdownMenuItems = [];
+    for (var child in children) {
+      var dob = DateFormat.yMMMMd().format(child.dob);
+      var item = DropdownMenuItem(
+        value: child,
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 5),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: Colors.red.withOpacity(0.2)),
+                child: SvgPicture.asset(
+                  child.gender == "male" || child.gender == "boy"
+                      ? "assets/images/boy.svg"
+                      : "assets/images/girl.svg",
+                  height: 40,
+                ),
+              ),
+              const SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    child.name,
+                    style: TextStyles.subtitleSm,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    "DOB: $dob",
+                    style: TextStyles.body.withColor(Colors.grey.shade600),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      );
+      dropdownMenuItems.add(item);
+    }
+    return dropdownMenuItems;
+  }
+
+  late ChildModel _selectedChild = widget.childrenModels.first;
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        const SizedBox(height: 25),
+        Row(
+          children: [
+            SizedBox(width: 10),
+            Expanded(
+              child: DropdownButton<ChildModel>(
+                items: buildChildModelWidget(widget.childrenModels),
+                icon: Container(
+                  padding: const EdgeInsets.only(left: 40),
+                  child: const Icon(Icons.arrow_drop_down),
+                ),
+                value: _selectedChild,
+                itemHeight: 60,
+                iconSize: 32,
+                alignment: Alignment.topLeft,
+                underline: Container(),
+                onChanged: (child) {
+                  setState(() {
+                    _selectedChild = child!;
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: 5),
+            InkWell(
+              onTap: () async {
+                ChildModel child = await showModalBottomSheet(
+                    constraints:
+                        const BoxConstraints(maxHeight: 470, minHeight: 400),
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (context) {
+                      return const AddNewChildPage();
+                    });
+                setState(() {
+                  _selectedChild = child;
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: Colors.red.withOpacity(0.2)),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.red,
+                  size: 26,
+                ),
+              ),
+            ),
+            const SizedBox(width: 15),
+          ],
+        ),
+        const SizedBox(height: 30),
+        ChildVaccines(child: _selectedChild),
+      ],
+    );
+  }
+}
+
+class ChildVaccines extends StatelessWidget {
+  final ChildModel child;
+  ChildVaccines({Key? key, required this.child}) : super(key: key);
+
   List<VaccineModel> week0 = [];
   List<VaccineModel> week6 = [];
   List<VaccineModel> week10 = [];
@@ -19,7 +166,6 @@ class HomeTabWidget extends StatelessWidget {
   List<VaccineModel> week26 = [];
   List<VaccineModel> week39 = [];
   List<VaccineModel> week65 = [];
-
   buildVaccineScheduleItem(List<VaccineModel> vaccs) {
     week0.clear();
     week6.clear();
@@ -57,70 +203,18 @@ class HomeTabWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var c = context.watch<AppModel>();
-    var child = c.getChildren().first;
-    var date = DateTime.now().difference(child.dob);
-    var vaccines = child.vaccines;
-    buildVaccineScheduleItem(vaccines);
-    return SafeArea(
-      child: Container(
-        color: Color(0xfafafa),
-        margin: EdgeInsets.only(bottom: 20),
-        child: ListView(
-          children: [
-            SizedBox(height: 25),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 5),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.red.withOpacity(0.2)),
-                    child: SvgPicture.asset(
-                      child.gender == "male"
-                          ? "assets/images/boy.svg"
-                          : "assets/images/girl.svg",
-                      height: 48,
-                    ),
-                  ),
-                  SizedBox(width: 15),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        child.name,
-                        style: TextStyles.subtitleSm,
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "${child.dob}",
-                        style: TextStyles.body.withColor(Colors.grey.shade600),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 30),
-            VaccineScheduleItem(index: 1, vaccines: week0),
-            VaccineScheduleItem(index: 2, vaccines: week6),
-            VaccineScheduleItem(index: 3, vaccines: week10),
-            VaccineScheduleItem(index: 4, vaccines: week14),
-            VaccineScheduleItem(index: 5, vaccines: week26),
-            VaccineScheduleItem(index: 1, vaccines: week39),
-            VaccineScheduleItem(index: 2, vaccines: week65),
-          ],
-        ),
-      ),
+    buildVaccineScheduleItem(child.vaccines);
+    return Column(
+      children: [
+        VaccineScheduleItem(index: 1, vaccines: week0),
+        VaccineScheduleItem(index: 2, vaccines: week6),
+        VaccineScheduleItem(index: 3, vaccines: week10),
+        VaccineScheduleItem(index: 4, vaccines: week14),
+        VaccineScheduleItem(index: 5, vaccines: week26),
+        VaccineScheduleItem(index: 1, vaccines: week39),
+        VaccineScheduleItem(index: 2, vaccines: week65),
+      ],
     );
-  }
-}
-
-class SingleRebuild extends ChangeNotifier {
-  rebuild() {
-    notifyListeners();
   }
 }
 
@@ -168,7 +262,7 @@ class _VaccineScheduleItemState extends State<VaccineScheduleItem> {
             color: Colors.deepOrangeAccent.withOpacity(0.6),
             size: 22,
           ),
-          SizedBox(width: 5),
+          const SizedBox(width: 5),
           Text(
             "Vaccines completed",
             style: TextStyles.subtitleSm
@@ -236,19 +330,19 @@ class _VaccineScheduleItemState extends State<VaccineScheduleItem> {
                   builder: (context, value, __) {
                     return vaccs_is_completed();
                   }),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               for (var vac in widget.vaccines) ...[
                 ItemWidget(vaccine: vac, notifier: isChangedNotifier),
               ],
             ],
           ),
-          Spacer(),
+          const Spacer(),
           Icon(
             Icons.arrow_forward_ios_outlined,
             size: 20,
             color: Colors.grey.shade800,
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
         ],
       ),
     );
@@ -292,11 +386,11 @@ class _ItemWidgetState extends State<ItemWidget> {
                     content: Container(
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.error,
                             color: Colors.white,
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Text(
                             "Unable to set value",
                             style: TextStyles.body,
@@ -316,7 +410,7 @@ class _ItemWidgetState extends State<ItemWidget> {
               color: Colors.red.withOpacity(0.8),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 8,
           ),
           SizedBox(

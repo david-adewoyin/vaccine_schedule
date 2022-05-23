@@ -26,7 +26,6 @@ class AppService {
   setUserOnboarded() async {
     try {
       await prefs.setBool(_isFreshInstall, false);
-      print("setting is fresh install as false");
     } catch (e) {
       print("unable to set fresh install");
     }
@@ -42,8 +41,8 @@ class AppService {
     return await db.insert(child);
   }
 
-  Future<ChildModel> getInitialChild() async {
+  Future<List<ChildModel>> getInitialChildren() async {
     var c = await db.getChildren();
-    return c!;
+    return c;
   }
 }
