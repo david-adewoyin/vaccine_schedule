@@ -4,6 +4,7 @@ import 'package:vaccine_scheduler/models/app_models.dart';
 import 'package:vaccine_scheduler/models/child_model.dart';
 import 'package:vaccine_scheduler/models/vaccine_model.dart';
 import 'package:vaccine_scheduler/services/app_service.dart';
+import 'package:vaccine_scheduler/services/notifciation_service.dart';
 
 BuildContext? _mainContext;
 BuildContext get mainContext => _mainContext!;
@@ -17,6 +18,7 @@ void setContext(BuildContext context) {
 class BaseAppCommand {
   AppService get appService => getProvided();
   AppModel get appModel => getProvided();
+  NotificationService get notificationService => getProvided();
 
   T getProvided<T>() {
     assert(_mainContext != null,
@@ -35,6 +37,7 @@ class BootstrapCommand extends BaseAppCommand {
       setContext(context);
     }
     await appService.init();
+    await notificationService.init();
     print(" is app fresh ${appService.isAppFreshInstall()}");
     bool fresh = appService.isAppFreshInstall();
     appModel.setIsFreshInstall(fresh);
@@ -56,6 +59,8 @@ class RegisterChildCommand extends BaseAppCommand {
       required String gender}) async {
     var child = await appService.registerChild(name, dob, gender);
     appModel.addChild(child);
+    notificationService.scheduleNotification(child);
+
     appService.setUserOnboarded();
   }
 }
@@ -66,6 +71,7 @@ class RegisterNewChildCommand extends BaseAppCommand {
       required DateTime dob,
       required String gender}) async {
     var child = await appService.registerChild(name, dob, gender);
+    notificationService.scheduleNotification(child);
     appModel.addChild(child);
     return child;
   }
@@ -73,6 +79,33 @@ class RegisterNewChildCommand extends BaseAppCommand {
 
 class ChangeVaccineTakenStateCommand extends BaseAppCommand {
   Future<bool> run(VaccineModel vaccine) async {
-    return await appService.ChangeVaccineTakenState(vaccine);
+    late bool res;
+    if (vaccine.isTaken!) {
+      res = await appService.changeVaccineTakenState(vaccine);
+      var completed =
+          await appService.checkVaccinesInPeriodIsCompleted(vaccine);
+      if (completed) {
+        await notificationService.removeNotification(vaccine);
+      }
+      return res;
+    }
+    var completed = await appService.checkVaccinesInPeriodIsCompleted(vaccine);
+    if (completed) {
+      ChildModel child = appModel
+          .getChildren()
+          .where((element) => element.id == vaccine.childId)
+          .first;
+      await notificationService.rescheduleNotification(child, vaccine);
+    }
+    res = await appService.changeVaccineTakenState(vaccine);
+    return res;
   }
+}
+
+class RemoveNotificationStateCommand extends BaseAppCommand {
+  run() async {}
+}
+
+class AddNotificationStateCommand extends BaseAppCommand {
+  run() async {}
 }

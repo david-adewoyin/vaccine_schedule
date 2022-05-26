@@ -20,6 +20,7 @@ class _AddNewChildPageState extends State<AddNewChildPage> {
   final TextEditingController _dateController = TextEditingController();
 
   late DateTime date;
+  bool loading = false;
   late String? gender;
 
   @override
@@ -212,14 +213,17 @@ class _AddNewChildPageState extends State<AddNewChildPage> {
                         ),
                         onPressed: () async {
                           if (!_formKey.currentState!.validate()) {
-                            print("errrrrrrrrrrrr");
                             return;
                           }
+                          if (loading == true) {
+                            return;
+                          }
+                          loading = true;
                           var name = _nameController.value.text;
 
                           var child = await RegisterNewChildCommand()
                               .run(name: name, gender: gender!, dob: date);
-
+                          loading = false;
                           Navigator.pop(context, child);
                           /*  Navigator.maybeOf(context)!.pushAndRemoveUntil(
                               MaterialPageRoute(

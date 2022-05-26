@@ -107,7 +107,7 @@ class _BuildWidgetState extends State<BuildWidget> {
                   child: const Icon(Icons.arrow_drop_down),
                 ),
                 value: _selectedChild,
-                itemHeight: 60,
+                itemHeight: 62,
                 iconSize: 32,
                 alignment: Alignment.topLeft,
                 underline: Container(),

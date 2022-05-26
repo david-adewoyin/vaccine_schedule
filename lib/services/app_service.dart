@@ -31,8 +31,15 @@ class AppService {
     }
   }
 
-  Future<bool> ChangeVaccineTakenState(VaccineModel vaccine) {
+  Future<bool> changeVaccineTakenState(VaccineModel vaccine) {
     return db.updateVaccine(vaccine);
+  }
+
+  Future<bool> checkVaccinesInPeriodIsCompleted(VaccineModel vaccine) async {
+    List<VaccineModel> vaccines = await db.getVaccines(vaccine.childId!);
+    // the length of vaccines where is taken is true must be equal to the length of vaccines list
+    return vaccines.where((element) => element.isTaken!).length ==
+        vaccines.length;
   }
 
   Future<ChildModel> registerChild(

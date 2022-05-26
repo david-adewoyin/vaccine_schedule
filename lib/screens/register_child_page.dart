@@ -2,6 +2,7 @@ import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:vaccine_scheduler/commands/bootstrap_command.dart';
 import 'package:vaccine_scheduler/screens/landing_page.dart';
+import 'package:vaccine_scheduler/services/notifciation_service.dart';
 import 'package:vaccine_scheduler/styles.dart';
 
 class RegisterChildPage extends StatefulWidget {
@@ -21,6 +22,7 @@ class _RegisterChildPageState extends State<RegisterChildPage> {
 
   late DateTime date;
   late String? gender;
+  bool loading = false;
 
   @override
   void dispose() {
@@ -219,14 +221,19 @@ class _RegisterChildPageState extends State<RegisterChildPage> {
                       ),
                       onPressed: () async {
                         if (!_formKey.currentState!.validate()) {
-                          print("errrrrrrrrrrrr");
                           return;
                         }
+                        if (loading == true) {
+                          return;
+                        }
+                        loading = true;
+
                         var name = _nameController.value.text;
 
                         await RegisterChildCommand()
                             .run(name: name, gender: gender!, dob: date);
 
+                        loading = false;
                         Navigator.maybeOf(context)!.pushAndRemoveUntil(
                             MaterialPageRoute(builder: (context) => HomePage()),
                             (route) => false);
